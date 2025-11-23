@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -34,7 +34,7 @@ public class ProductController {
 
     @GetMapping("/get")
     public ResponseEntity<?> getProducts(){
-        ArrayList<Product> products = productService.getProducts();
+        List<Product> products = productService.getProducts();
         if (products.isEmpty()){
             return ResponseEntity.status(400).body(new ApiResponse("There are no products to show"));
         }
@@ -44,7 +44,7 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody @Valid Product product, Errors errors){
+    public ResponseEntity<?> updateProduct(@PathVariable Integer id, @RequestBody @Valid Product product, Errors errors){
         if (errors.hasErrors()){
             return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
         }
@@ -57,7 +57,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable String id){
+    public ResponseEntity<?> deleteProduct(@PathVariable Integer id){
         if (productService.deleteProduct(id)){
             return ResponseEntity.status(200).body(new ApiResponse("The product have been deleted successfully"));
         }
@@ -66,9 +66,9 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/get/by-category-sorted-by-price/{category}")
-    public ResponseEntity<?> getProductsByCategorySortedByPrice(@PathVariable String category){
-        ArrayList<Product> sortedProduct= productService.getProductsByCategorySortedByPrice(category);
+    @GetMapping("/get/by-category-sorted-by-price/{categoryId}")
+    public ResponseEntity<?> getProductsByCategorySortedByPrice(@PathVariable Integer categoryId){
+        List<Product> sortedProduct= productService.getProductsByCategorySortedByPrice(categoryId);
         if (sortedProduct.isEmpty()){
             return ResponseEntity.status(400).body(new ApiResponse("There are no products to show"));
         }else {
@@ -76,9 +76,9 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/product-count-in-category/{categoryName}")                                /* extra */
-    public ResponseEntity<?> countProductInCategoryName(@PathVariable String categoryName){
-        int count=productService.countProductInCategoryName(categoryName);
+    @GetMapping("/product-count-in-category/{categoryId}")                                /* extra */
+    public ResponseEntity<?> countProductInCategory(@PathVariable Integer categoryId){
+        int count=productService.countProductInCategoryName(categoryId);
         if (count==0){
             return ResponseEntity.status(400).body(new ApiResponse("There are no products to show"));
         }else {

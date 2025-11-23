@@ -10,6 +10,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -31,7 +32,7 @@ public class UserController {
 
     @GetMapping("/get")
     public ResponseEntity<?> getUsers(){
-        ArrayList<User> users=userService.getUsers();
+        List<User> users=userService.getUsers();
         if (users.isEmpty()){
             return ResponseEntity.status(400).body(new ApiResponse("There are no users to show"));
         }
@@ -41,7 +42,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody @Valid User user, Errors errors){
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody @Valid User user, Errors errors){
         if (errors.hasErrors()){
             return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
         }
@@ -54,7 +55,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable String id){
+    public ResponseEntity<?> deleteUser(@PathVariable Integer id){
         if (userService.deleteUser(id)){
             return ResponseEntity.status(200).body(new ApiResponse("The user have been deleted successfully"));
         }
@@ -64,7 +65,7 @@ public class UserController {
     }
 
     @PutMapping("/add-balance/{id}/{addedBalance}")
-    public ResponseEntity<?> addBalanceFunds(@PathVariable String id, @PathVariable double addedBalance){
+    public ResponseEntity<?> addBalanceFunds(@PathVariable Integer id, @PathVariable double addedBalance){
         if (userService.addBalanceFunds(id,addedBalance)){
             return ResponseEntity.status(200).body(new ApiResponse("The balance have been added successfully"));
         }else {
@@ -73,7 +74,7 @@ public class UserController {
     }
 
     @PutMapping("/buy-product/{userId}/{merchantId}/{productId}")
-    public ResponseEntity<?> buyProduct(@PathVariable String userId, @PathVariable String merchantId, @PathVariable String productId){
+    public ResponseEntity<?> buyProduct(@PathVariable Integer userId, @PathVariable Integer merchantId, @PathVariable Integer productId){
         String value= userService.buyProduct(userId,merchantId,productId);
         switch (value){
             case "ok":
@@ -94,7 +95,7 @@ public class UserController {
     }
 
     @PutMapping("/bulk-buy-product/{userId}/{merchantId}/{productId}/{count}")
-    public ResponseEntity<?> bulkBuyProduct(@PathVariable String userId, @PathVariable String merchantId, @PathVariable String productId, @PathVariable int count){
+    public ResponseEntity<?> bulkBuyProduct(@PathVariable Integer userId, @PathVariable Integer merchantId, @PathVariable Integer productId, @PathVariable int count){
         String value= userService.bulkBuyProducts(userId,merchantId,productId,count);
         switch (value){
             case "ok":

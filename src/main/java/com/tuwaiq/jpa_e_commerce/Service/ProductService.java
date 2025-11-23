@@ -2,56 +2,61 @@ package com.tuwaiq.jpa_e_commerce.Service;
 
 import com.tuwaiq.jpa_e_commerce.Model.Category;
 import com.tuwaiq.jpa_e_commerce.Model.Product;
+import com.tuwaiq.jpa_e_commerce.Repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
-    ArrayList<Product> products = new ArrayList<>();
+    private final ProductRepository productRepository;
     private final CategoryService categoryService;
 
     public boolean addProduct(Product product){
-        for (Category category:categoryService.categories){
-            if (category.getId().equalsIgnoreCase(product.getCategoryId())){
-                products.add(product);
+        for (Category category:categoryService.getCategories()){
+            if (category.getId().equals(product.getCategoryId())){
+                productRepository.save(product);
                 return true;
             }
         }
         return false;
     }
 
-    public ArrayList<Product> getProducts(){
-        return products;
+    public List<Product> getProducts(){
+        return productRepository.findAll();
     }
 
-    public Boolean updateProduct(String id,Product product){
-        for (int i = 0; i< products.size(); i++) {
-            if (products.get(i).getId().equalsIgnoreCase(id)){
-                products.set(i,product);
-                return true;
-            }
+    public Boolean updateProduct(Integer id,Product product){
+        Product oldProduct =productRepository.getById(id);
+        if (oldProduct ==null){
+            return false;
+        }else {
+            oldProduct.setName(product.getName());
+            oldProduct.setPrice(product.getPrice());
+            oldProduct.setCategoryId(product.getCategoryId());
+            productRepository.save(oldProduct);
+            return true;
         }
-        return false;
     }
 
-    public Boolean deleteProduct(String id){
-        for (Product product: products){
-            if (product.getId().equalsIgnoreCase(id)){
-                products.remove(product);
-                return true;
-            }
+    public Boolean deleteProduct(Integer id){
+        Product product =productRepository.getById(id);
+        if (product ==null){
+            return false;
+        }else {
+            productRepository.delete(product);
+            return true;
         }
-        return false;
     }
 
-    public ArrayList<Product> getProductsByCategorySortedByPrice(String categoryId){
-        ArrayList<Product> sortedProductByPrice=new ArrayList<>();
-        for (Product product:products){
-            if (product.getCategoryId().equalsIgnoreCase(categoryId)){
+    public List<Product> getProductsByCategorySortedByPrice(Integer categoryId){
+        List<Product> sortedProductByPrice=new ArrayList<>();
+        for (Product product:this.getProducts()){
+            if (product.getCategoryId().equals(categoryId)){
                 sortedProductByPrice.add(product);
             }
         }
@@ -59,22 +64,16 @@ public class ProductService {
         return sortedProductByPrice;
     }
 
-    public int countProductInCategoryName(String categoryName){                 /* extra */
-        String categoryId="";
-        ArrayList<Product> products1 =new ArrayList<>();
-        for (Category category : categoryService.categories){
-            if (category.getName().equalsIgnoreCase(categoryName)){
-                categoryId= category.getId();
-            }
-        }
-        for (Product product:products){
-            if (product.getCategoryId().equalsIgnoreCase(categoryId)){
-                products1.add(product);
+    public int countProductInCategoryName(Integer categoryId){                 /* extra */
+        ArrayList<Product> products =new ArrayList<>();
+        for (Product product:this.getProducts()){
+            if (product.getCategoryId().equals(categoryId)){
+                products.add(product);
             }
         }
         if (products.isEmpty()){
             return 0;
         }
-        return products1.size();
+        return products.size();
     }
 }
