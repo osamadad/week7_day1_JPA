@@ -10,6 +10,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/category")
@@ -31,7 +32,7 @@ public class CategoryController {
 
     @GetMapping("/get")
     public ResponseEntity<?> getCategories(){
-        ArrayList<Category> categories = categoryService.getCategories();
+        List<Category> categories = categoryService.getCategories();
         if (categories.isEmpty()){
             return ResponseEntity.status(400).body(new ApiResponse("There are no categories to show"));
         }
@@ -41,7 +42,7 @@ public class CategoryController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateCategory(@PathVariable String id, @RequestBody @Valid Category category, Errors errors){
+    public ResponseEntity<?> updateCategory(@PathVariable Integer id, @RequestBody @Valid Category category, Errors errors){
         if (errors.hasErrors()){
             return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
         }
@@ -54,7 +55,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteCategory(@PathVariable String id){
+    public ResponseEntity<?> deleteCategory(@PathVariable Integer id){
         if (categoryService.deleteCategory(id)){
             return ResponseEntity.status(200).body(new ApiResponse("The category have been deleted successfully"));
         }

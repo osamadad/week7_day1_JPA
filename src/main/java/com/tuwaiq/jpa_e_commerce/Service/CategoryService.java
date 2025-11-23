@@ -1,40 +1,46 @@
 package com.tuwaiq.jpa_e_commerce.Service;
 
 import com.tuwaiq.jpa_e_commerce.Model.Category;
+import com.tuwaiq.jpa_e_commerce.Repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
 
-    ArrayList<Category> categories = new ArrayList<>();
+    private final CategoryRepository categoryRepository;
 
     public void addCategory(Category category){
-        categories.add(category);
+        categoryRepository.save(category);
     }
 
-    public ArrayList<Category> getCategories(){
-        return categories;
+    public List<Category> getCategories(){
+        return categoryRepository.findAll();
     }
 
-    public Boolean updateCategory(String id,Category category){
-        for (int i = 0; i< categories.size(); i++) {
-            if (categories.get(i).getId().equalsIgnoreCase(id)){
-                categories.set(i,category);
-                return true;
-            }
+    public Boolean updateCategory(Integer id,Category category){
+        Category oldCategory=categoryRepository.getById(id);
+        if (oldCategory==null){
+            return false;
         }
-        return false;
+        else {
+            oldCategory.setName(category.getName());
+            categoryRepository.save(oldCategory);
+            return true;
+        }
     }
 
-    public Boolean deleteCategory(String id){
-        for (Category category: categories){
-            if (category.getId().equalsIgnoreCase(id)){
-                categories.remove(category);
-                return true;
-            }
+    public Boolean deleteCategory(Integer id){
+        Category category= categoryRepository.getById(id);
+        if (category==null){
+            return false;
+        }else {
+            categoryRepository.delete(category);
+            return true;
         }
-        return false;
     }
 }

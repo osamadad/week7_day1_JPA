@@ -1,41 +1,46 @@
 package com.tuwaiq.jpa_e_commerce.Service;
 
 import com.tuwaiq.jpa_e_commerce.Model.Merchant;
+import com.tuwaiq.jpa_e_commerce.Repository.MerchantRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MerchantService {
 
-    ArrayList<Merchant> merchants= new ArrayList<>();
+    private final MerchantRepository merchantRepository;
 
     public void addMerchant(Merchant merchant){
-        merchants.add(merchant);
+        merchantRepository.save(merchant);
     }
 
-    public ArrayList<Merchant> getMerchants(){
-        return merchants;
+    public List<Merchant> getMerchants(){
+        return merchantRepository.findAll();
     }
 
-    public boolean updateMerchant(String id, Merchant merchant){
-        for (int i=0;i<merchants.size();i++){
-            if (merchants.get(i).getId().equalsIgnoreCase(id)){
-                merchants.set(i,merchant);
-                return true;
-            }
+    public boolean updateMerchant(Integer id, Merchant merchant){
+        Merchant oldMerchant=merchantRepository.getById(id);
+        if (oldMerchant==null){
+            return false;
+        }else {
+            oldMerchant.setName(merchant.getName());
+            return true;
         }
-        return false;
     }
 
-    public boolean deleteMerchant(String id){
-        for (Merchant merchant:merchants){
-            if (merchant.getId().equalsIgnoreCase(id)){
-                merchants.remove(merchant);
-                return true;
-            }
+    public boolean deleteMerchant(Integer id){
+        Merchant merchant=merchantRepository.getById(id);
+        if (merchant==null){
+            return false;
         }
-        return false;
+        else {
+            merchantRepository.delete(merchant);
+            return true;
+        }
     }
 
 

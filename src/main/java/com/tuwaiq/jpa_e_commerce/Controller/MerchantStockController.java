@@ -11,6 +11,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/merchant-stock")
@@ -42,7 +43,7 @@ public class MerchantStockController {
 
     @GetMapping("/get")
     public ResponseEntity<?> getMerchantStocks(){
-        ArrayList<MerchantStock> merchantStocks = merchantStockService.getMerchantStocks();
+        List<MerchantStock> merchantStocks = merchantStockService.getMerchantStocks();
         if (merchantStocks.isEmpty()){
             return ResponseEntity.status(400).body(new ApiResponse("There are no merchant stocks to show"));
         }
@@ -52,7 +53,7 @@ public class MerchantStockController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateMerchantStock(@PathVariable String id, @RequestBody @Valid MerchantStock merchantStock, Errors errors){
+    public ResponseEntity<?> updateMerchantStock(@PathVariable Integer id, @RequestBody @Valid MerchantStock merchantStock, Errors errors){
         if (errors.hasErrors()){
             return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
         }
@@ -65,7 +66,7 @@ public class MerchantStockController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteMerchantStock(@PathVariable String id){
+    public ResponseEntity<?> deleteMerchantStock(@PathVariable Integer id){
         if (merchantStockService.deleteMerchantStock(id)){
             return ResponseEntity.status(200).body(new ApiResponse("The merchant stock have been deleted successfully"));
         }
@@ -75,7 +76,7 @@ public class MerchantStockController {
     }
 
     @PutMapping("/increase-stock/{merchantId}/{productId}/{newStock}")
-    public ResponseEntity<?> increaseProductStock(@PathVariable String merchantId, @PathVariable String productId, @PathVariable int newStock){
+    public ResponseEntity<?> increaseProductStock(@PathVariable Integer merchantId, @PathVariable Integer productId, @PathVariable Integer newStock){
         String  value= merchantStockService.increaseProductStock(merchantId,productId,newStock);
         switch (value){
             case "ok":
@@ -90,8 +91,8 @@ public class MerchantStockController {
     }
 
     @GetMapping("/get-total-stock/{productId}")
-    public ResponseEntity<?> getProductStockFromAllMerchants(@PathVariable String productId){
-        ArrayList<String> productStockFromAllMerchants=merchantStockService.getProductStockFromAllMerchants(productId);
+    public ResponseEntity<?> getProductStockFromAllMerchants(@PathVariable Integer productId){
+        List<String> productStockFromAllMerchants=merchantStockService.getProductStockFromAllMerchants(productId);
         if (productStockFromAllMerchants.isEmpty()){
             return ResponseEntity.status(400).body(new ApiResponse("There are no product with this id found"));
         }
@@ -101,8 +102,8 @@ public class MerchantStockController {
     }
 
     @GetMapping("/more-product-from-merchant/{merchantId}")
-    public ResponseEntity<?> getMoreProductFromMerchant(@PathVariable String merchantId){
-        ArrayList<Product> moreProducts=merchantStockService.getMoreProductFromMerchant(merchantId);
+    public ResponseEntity<?> getMoreProductFromMerchant(@PathVariable Integer merchantId){
+        List<Product> moreProducts=merchantStockService.getMoreProductFromMerchant(merchantId);
         if (moreProducts.isEmpty()){
             return ResponseEntity.status(400).body(new ApiResponse("There are no products found with this merchant id"));
         }

@@ -3,50 +3,58 @@ package com.tuwaiq.jpa_e_commerce.Service;
 import com.tuwaiq.jpa_e_commerce.Model.MerchantStock;
 import com.tuwaiq.jpa_e_commerce.Model.Product;
 import com.tuwaiq.jpa_e_commerce.Model.User;
+import com.tuwaiq.jpa_e_commerce.Repository.MerchantStockRepository;
+import com.tuwaiq.jpa_e_commerce.Repository.ProductRepository;
+import com.tuwaiq.jpa_e_commerce.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    ArrayList<User> users = new ArrayList<>();
-    private final ProductService productService;
-    private final MerchantStockService merchantStocksService;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final MerchantStockRepository merchantStocksRepository;
 
     public void addUser(User user) {
-        users.add(user);
+        userRepository.save(user);
     }
 
-    public ArrayList<User> getUsers() {
-        return users;
+    public List<User> getUsers() {
+        return userRepository.findAll();
     }
 
-    public Boolean updateUser(String id, User user) {
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getId().equalsIgnoreCase(id)) {
-                users.set(i, user);
-                return true;
-            }
+    public Boolean updateUser(Integer id, User user) {
+        User oldUser =userRepository.getById(id);
+        if (oldUser ==null){
+            return false;
+        }else {
+            oldUser.setUsername(user.getUsername());
+            oldUser.setPassword(user.getPassword());
+            oldUser.setEmail(user.getEmail());
+            oldUser.setRole(user.getRole());
+            oldUser.setBalance(user.getBalance());
+            userRepository.save(oldUser);
+            return true;
         }
-        return false;
     }
 
-    public Boolean deleteUser(String id) {
-        for (User user : users) {
-            if (user.getId().equalsIgnoreCase(id)) {
-                users.remove(user);
-                return true;
-            }
+    public Boolean deleteUser(Integer id) {
+        User User =userRepository.getById(id);
+        if (User ==null){
+            return false;
+        }else {
+            userRepository.delete(User);
+            return true;
         }
-        return false;
     }
 
-    public boolean addBalanceFunds(String id,double addedBalance){
-        for (User user:users){
-            if (user.getId().equalsIgnoreCase(id)){
+    public boolean addBalanceFunds(Integer id,double addedBalance){
+        for (User user:this.getUsers()){
+            if (user.getId().equals(id)){
                 user.setBalance(user.getBalance()+addedBalance);
                 return true;
             }
@@ -54,7 +62,7 @@ public class UserService {
         return false;
     }
 
-    public String buyProduct(String userId, String merchantId, String productId) {
+    public String buyProduct(Integer userId, Integer merchantId, Integer productId) {
         double productPrice = pricingProduct(productId,1);
         if (productPrice == 0) {
             return "product id error";
@@ -62,7 +70,7 @@ public class UserService {
         return buying(userId, merchantId, productId, productPrice,1);
     }
 
-    public String bulkBuyProducts(String userId, String merchantId, String productId, int count){
+    public String bulkBuyProducts(Integer userId, Integer merchantId, Integer productId, int count){
         double productPrice = pricingProduct(productId, count);
         if (productPrice == 0) {
             return "product id error";
@@ -70,15 +78,15 @@ public class UserService {
         return buying(userId, merchantId, productId, productPrice,count);
     }
 
-    private String buying(String userId, String merchantId, String productId, double productPrice, int count) {
+    private String buying(Integer userId, Integer merchantId, Integer productId, double productPrice, int count) {
         boolean productFound = false;
         boolean merchantFound = false;
         boolean userFound = false;
-        for (User user : users) {
-            if (user.getId().equalsIgnoreCase(userId)) {
-                for (MerchantStock merchantStock : merchantStocksService.merchantStocks) {
-                    if (merchantStock.getMerchantId().equalsIgnoreCase(merchantId)) {
-                        if (merchantStock.getProductId().equalsIgnoreCase(productId)) {
+        for (User user : this.getUsers()) {
+            if (user.getId().equals(userId)) {
+                for (MerchantStock merchantStock : merchantStocksRepository.findAll()) {
+                    if (merchantStock.getMerchantId().equals(merchantId)) {
+                        if (merchantStock.getProductId().equals(productId)) {
                             if (merchantStock.getStock() > 0) {
                                 if (user.getBalance() >= productPrice) {
                                     merchantStock.setStock(merchantStock.getStock() - count);
@@ -112,13 +120,13 @@ public class UserService {
         }
     }
 
-    private double pricingProduct(String productId,int count) {
-        for (Product product : productService.getProducts()) {
-            if (product.getId().equalsIgnoreCase(productId)) {
+    private double pricingProduct(Integer productId,int count) {
+        for (Product product : productRepository.findAll()) {
+            if (product.getId().equals(productId)) {
                 if (count>1){
-                    if (product.getCategoryId().equalsIgnoreCase("02001")){                 /* check if category is electronics */
+                    if (product.getCategoryId().equals(1)){                 /* check if category is electronics */
                         return product.getPrice()*count-(product.getPrice()*0.1);
-                    } else if (product.getCategoryId().equalsIgnoreCase("02002")) {         /* check if category is books */
+                    } else if (product.getCategoryId().equals(2)) {         /* check if category is books */
                         return product.getPrice()*count-(product.getPrice()*0.5);
                     }
                 }
