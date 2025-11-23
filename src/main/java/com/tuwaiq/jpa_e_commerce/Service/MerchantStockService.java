@@ -16,7 +16,7 @@ public class MerchantStockService {
     ArrayList<MerchantStock> merchantStocks = new ArrayList<>();
     private final ProductService productService;
     private final MerchantService merchantService;
-    private final UserService userService;
+
 
     public String addMerchantStock(MerchantStock merchantStock) {
         String value = merchantProductValidation(merchantStock.getMerchantId(), merchantStock.getProductId());
@@ -87,79 +87,6 @@ public class MerchantStockService {
         }
     }
 
-    public String buyProduct(String userId, String merchantId, String productId) {
-        double productPrice = pricingProduct(productId,1);
-        if (productPrice == 0) {
-            return "product id error";
-        }
-        return buying(userId, merchantId, productId, productPrice,1);
-    }
-
-    public String bulkBuyProducts(String userId, String merchantId, String productId, int count){
-        double productPrice = pricingProduct(productId, count);
-        if (productPrice == 0) {
-            return "product id error";
-        }
-        return buying(userId, merchantId, productId, productPrice,count);
-    }
-
-    private String buying(String userId, String merchantId, String productId, double productPrice, int count) {
-        boolean productFound = false;
-        boolean merchantFound = false;
-        boolean userFound = false;
-        for (User user : userService.users) {
-            if (user.getId().equalsIgnoreCase(userId)) {
-                for (MerchantStock merchantStock : merchantStocks) {
-                    if (merchantStock.getMerchantId().equalsIgnoreCase(merchantId)) {
-                        if (merchantStock.getProductId().equalsIgnoreCase(productId)) {
-                            if (merchantStock.getStock() > 0) {
-                                if (user.getBalance() >= productPrice) {
-                                    merchantStock.setStock(merchantStock.getStock() - count);
-                                    user.setBalance(user.getBalance() - productPrice);
-                                    return "ok";
-                                } else {
-                                    return "balance error";
-                                }
-                            } else {
-                                return "stock error";
-                            }
-                        } else {
-                            productFound = true;
-                        }
-                    } else {
-                        merchantFound = true;
-                    }
-                }
-            } else {
-                userFound = true;
-            }
-        }
-        if (!userFound) {
-            return "user id error";
-        }else if (!merchantFound){
-            return "merchant id error";
-        }else if ((!productFound)){
-            return "product id error";
-        }else {
-            return "general error";
-        }
-    }
-
-    private double pricingProduct(String productId,int count) {
-        for (Product product : productService.getProducts()) {
-            if (product.getId().equalsIgnoreCase(productId)) {
-                if (count>1){
-                    if (product.getCategoryId().equalsIgnoreCase("02001")){
-                        return product.getPrice()*count-(product.getPrice()*0.1);
-                    } else if (product.getCategoryId().equalsIgnoreCase("02002")) {
-                        return product.getPrice()*count-(product.getPrice()*0.5);
-                    }
-                }
-                return product.getPrice();
-            }
-        }
-        return 0;
-    }
 
     public ArrayList<String> getProductStockFromAllMerchants(String productId){
         ArrayList<String> productStockFromAllMerchants = new ArrayList<>();
