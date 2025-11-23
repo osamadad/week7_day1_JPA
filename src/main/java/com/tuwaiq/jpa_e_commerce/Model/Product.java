@@ -25,8 +25,7 @@ public class Product {
     @Positive(message = "Sorry, the product price can't be 0 or less, please try again")
     @Column(columnDefinition = "int not null")
     private Double price;
-    @NotEmpty(message = "Sorry, the category id can't be empty, please try again")
-    @Size(max = 10,message = "Sorry, the category id can't be more than 10 characters")
-    @Column(columnDefinition = "varchar(10) not null unique")
+    @NotNull(message = "Sorry, the category id can't be empty, please try again")
+    @Column(columnDefinition = "varchar(10) not null")
     private Integer categoryId;
 }

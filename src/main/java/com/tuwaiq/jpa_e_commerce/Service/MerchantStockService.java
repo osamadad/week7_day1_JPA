@@ -81,6 +81,7 @@ public class MerchantStockService {
             if (merchantStock.getMerchantId().equals(merchantId)) {
                 if (merchantStock.getProductId().equals(productId)) {
                     merchantStock.setStock(merchantStock.getStock() + newStock);
+                    merchantStockRepository.save(merchantStock);
                     return "ok";
                 } else {
                     productFound = true;

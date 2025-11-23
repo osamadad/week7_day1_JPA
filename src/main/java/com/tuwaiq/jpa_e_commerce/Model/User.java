@@ -17,7 +17,7 @@ public class User {
     private Integer id;
     @NotEmpty(message = "Sorry, your username can't be empty, please try again")
     @Size(min = 5, max = 15, message = "Sorry, your username can't be less than 5 or longer than 15 characters long, please try again")
-    @Column(columnDefinition = "varchar(15) nou null")
+    @Column(columnDefinition = "varchar(15) not null")
     private String username;
     @NotEmpty(message = "Sorry, your password can't be empty, please try again")
     @Size(min = 6, max = 15, message = "Sorry, your password can't be less than 6 or longer than 15 characters long, please try again")

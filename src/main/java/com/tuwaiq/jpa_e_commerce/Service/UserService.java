@@ -56,6 +56,7 @@ public class UserService {
         for (User user:this.getUsers()){
             if (user.getId().equals(id)){
                 user.setBalance(user.getBalance()+addedBalance);
+                userRepository.save(user);
                 return true;
             }
         }
@@ -90,7 +91,9 @@ public class UserService {
                             if (merchantStock.getStock() > 0) {
                                 if (user.getBalance() >= productPrice) {
                                     merchantStock.setStock(merchantStock.getStock() - count);
+                                    merchantStocksRepository.save(merchantStock);
                                     user.setBalance(user.getBalance() - productPrice);
+                                    userRepository.save(user);
                                     return "ok";
                                 } else {
                                     return "balance error";
